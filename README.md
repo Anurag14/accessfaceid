@@ -125,7 +125,7 @@ Those models were designed to support multiclass detection (~80 classes). Becaus
 
 This is an overkill for the simple task of just detecting faces. This work is a proof of concept that lighter networks can be designed to perform simpler tasks that do not require relatively large number of features.
 
-[1] Those models cannot perform Real Time on CPU (YOLO at least). Even tiny-yolo version cannot achieve 1 fps on CPU (tested on 2015 MacBook Pro with 2.6 GHz Intel Core i5).
+[1] Those models cannot perform Real Time on CPU (YOLO at least). Even tiny-yolo version cannot achieve 1 fps on CPU (tested on 2015 Lenovo Yoga 500 with 2.6 GHz Intel Core i7).
 
 ### How was it trained?
 
