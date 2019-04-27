@@ -1,20 +1,21 @@
-# *faced*
+# *accessfaceid*
 
-🚀 😏 CPU (Near) Real Time face detection
+🚀 😏 CPU (Near) Real Time face detection alignment and verification
 
 <p align="center">
   <img src="examples/demo_yolo.gif"/>
 </p>
 
-## How to install
+## How to run
 
 ```bash
-$ pip install git+https://github.com/iitzco/faced.git
+$ git clone https://github.com/Anurag14/accessfaceid/
+$ pip install -r requirements.txt
 ```
 
 > Soon to be available on `PyPI`.
 
-## How to use
+## How to use detection as an library
 
 ### As library
 
