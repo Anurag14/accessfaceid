@@ -1,9 +1,9 @@
 # *accessfaceid*
 
-🚀 😏 CPU (Near) Real Time face detection alignment and verification
+:dragon: CPU (Near) Real Time face detection alignment and verification
 
 <p align="center">
-  <img src="examples/demo_yolo.gif"/>
+  <img src="faced/examples/demo_yolo.gif"/>
 </p>
 
 ## How to run
@@ -15,7 +15,7 @@ $ pip install -r requirements.txt
 
 > Soon to be available on `PyPI`.
 
-## How to use detection as an library
+## How to use face detection as an library
 
 ### As library
 
@@ -69,16 +69,16 @@ See `faced --help` for more information.
 ## Examples
 
 <p float="left">
-  <img src="examples/arg-faced.png" width="400" />
-  <img src="examples/gino-faced.png" width="400" />
+  <img src="faced/examples/arg-faced.png" width="400" />
+  <img src="faced/examples/gino-faced.png" width="400" />
 </p>
 <p float="left">
-  <img src="examples/foo-faced.png" width="400" />
-  <img src="examples/tri-faced.png" width="200" />
+  <img src="faced/examples/foo-faced.png" width="400" />
+  <img src="faced/examples/tri-faced.png" width="200" />
 </p>
 <p float="left">
-  <img src="examples/phelps-faced.png" width="400" />
-  <img src="examples/will-faced.png" width="400" />
+  <img src="faced/examples/phelps-faced.png" width="400" />
+  <img src="faced/examples/will-faced.png" width="400" />
 </p>
 
 ## Performance
@@ -93,11 +93,11 @@ Haar Cascades are one of the most used face detections models. Here's a comparis
 
 *faced*             |  Haar Cascade
 :-------------------------:|:-------------------------:
-![](examples/demo_yolo.gif)  |  ![](examples/demo_haar.gif)
-![](examples/foo-faced.png)  |  ![](examples/foo-haar.png)
-![](examples/gino-faced.png)  |  ![](examples/gino-haar.png)
+![](faced/examples/demo_yolo.gif)  |  ![](faced/examples/demo_haar.gif)
+![](faced/examples/foo-faced.png)  |  ![](faced/examples/foo-haar.png)
+![](faced/examples/gino-faced.png)  |  ![](faced/examples/gino-haar.png)
 
-## About *faced*
+## About *face detection* method
 
 *faced* is an ensemble of 2 deep neural networks (implemented using **tensorflow**) designed to run at Real Time speed in CPUs.
 
@@ -106,7 +106,7 @@ Haar Cascades are one of the most used face detections models. Here's a comparis
 A custom fully convolutional neural network (FCNN) implementation based on [YOLO](https://pjreddie.com/darknet/yolo/). Takes a 288x288 RGB image and outputs a 9x9 grid where each cell can predict bounding boxes and probability of one face.
 
 <p align="center">
-  <img src="examples/cnn-scheme.png"/>
+  <img src="faced/examples/cnn-scheme.png"/>
 </p>
 
 
@@ -115,7 +115,7 @@ A custom fully convolutional neural network (FCNN) implementation based on [YOLO
 A custom standard CNN (Convolutions + Fully Connected layers) is used to take a face-containing rectangle and predict the face bounding box. This is a fine-tunning step. (outputs of Stage 1 model is not so accurate by itself, this is a *corrector* step that takes the each bouding box predicted from the previous step to improve bounding box quality.)
 
 <p align="center">
-  <img src="examples/face-corrector-scheme.png"/>
+  <img src="faced/examples/face-corrector-scheme.png"/>
 </p>
 
 
