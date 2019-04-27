@@ -15,7 +15,7 @@ $ pip install -r requirements.txt
 
 > Soon to be available on `PyPI`.
 
-## How to use detection as an library
+## How to use face detection as an library
 
 ### As library
 
@@ -97,7 +97,7 @@ Haar Cascades are one of the most used face detections models. Here's a comparis
 ![](faced/examples/foo-faced.png)  |  ![](faced/examples/foo-haar.png)
 ![](faced/examples/gino-faced.png)  |  ![](faced/examples/gino-haar.png)
 
-## About *faced*
+## About *face detection* method
 
 *faced* is an ensemble of 2 deep neural networks (implemented using **tensorflow**) designed to run at Real Time speed in CPUs.
 
