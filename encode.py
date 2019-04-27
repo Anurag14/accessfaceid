@@ -35,8 +35,8 @@ def process_and_encode(dataset):
         if len(encoding) > 0 : 
             known_encodings.append(encoding[0])
             known_names.append(name)
-    np.savez('encoding.npz',encodings=known_encodings,names=known_names)
+    np.savez('data/encodings/encoding.npz',encodings=known_encodings,names=known_names)
     return 
 
 if __name__ == "__main__":
-   process_and_encode('faces') 
+   process_and_encode('data/faces') 

@@ -7,7 +7,7 @@ video_capture = cv2.VideoCapture(0)
 
 
 print("[LOG] Loading Encoded faces ...")
-file = np.load('encoding.npz')
+file = np.load('data/encodings/encoding.npz')
 known_face_encodings=file["encodings"]
 known_face_names = file["names"]
 # Initialize some variables
