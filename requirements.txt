@@ -1,0 +1,9 @@
+tensorflow
+keras
+scipy
+scikit-learn
+opencv-python
+h5py
+matplotlib
+git+https://github.com/iitzco/faced.git
+keras_vggface
