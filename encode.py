@@ -34,7 +34,7 @@ def process_and_encode(dataset):
         # the person's name is the name of the folder where the image comes from
         name = image_path.split(os.path.sep)[-2]
         if len(encoding) > 0 : 
-            known_encodings.append(encoding[0])
+            known_encodings.append(encoding)
             known_names.append(name)
     np.savez('data/encodings/encoding.npz',encodings=known_encodings,names=known_names)
     return 

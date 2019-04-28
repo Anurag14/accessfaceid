@@ -61,9 +61,9 @@ def process_frame(bboxes, frame, vgg_face_descriptor):
         y2 = int(y + h/2)
         identity = find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor)
         # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, identity, (x1 + 6, y2 - 6), font, 1.0, (255, 255, 255), 1)
 
     return frame
 
@@ -97,13 +97,12 @@ def who_is_it(image, database,vgg_face_descriptor,epsilon=0.4):
     """
     encoding = vgg_face_descriptor.predict(preprocess_image(image))[0,:]
     identity = "Unknown"
-    
     # Loop over the database dictionary's names and encodings.
     i=0
     for db_enc in database["encodings"]:
         cosine_similarity = findCosineSimilarity(encoding, db_enc)
         if cosine_similarity < epsilon:
-            identity = database["name"][i]
+            identity = database["names"][i]
             break
         i+=1
     return identity
