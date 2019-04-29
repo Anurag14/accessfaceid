@@ -1,76 +1,115 @@
-import face_recognition
-import cv2
-import os
+import cv2,os
 import numpy as np
-# Get a reference to webcam #0 (the default one)
-video_capture = cv2.VideoCapture(0)
+from faced import FaceDetector
+from faced.utils import annotate_image
+from training.vggface import vggface
+from training.utils import preprocess_image,findCosineSimilarity
+from keras.models import Model
+import tensorflow as tf
+def prepare_database():
+    print("[LOG] Loading Encoded faces ...")
+    file = np.load('data/encodings/encoding.npz')
+    known_face_encodings=file["encodings"]
+    known_face_names = file["names"]
+    database={"names":known_face_names,"encodings":known_face_encodings}
+    return database
 
 
-print("[LOG] Loading Encoded faces ...")
-file = np.load('data/encodings/encoding.npz')
-known_face_encodings=file["encodings"]
-known_face_names = file["names"]
-# Initialize some variables
-face_locations = []
-face_encodings = []
-face_names = []
-process_this_frame = True
 
-while True:
-    # Grab a single frame of video
-    ret, frame = video_capture.read()
+frame_interval=2
+def webcam_face_recognizer(database):
+    """
+    Runs a loop that extracts images from the computer's webcam and determines whether or not
+    it contains the face of a person in our database.
 
-    # Resize frame of video to 1/4 size for faster face recognition processing
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    If it contains a face, an audio message will be played welcoming the user.
+    If not, the program will process the next frame from the webcam
+    """
 
-    # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-    rgb_small_frame = small_frame[:, :, ::-1]
+    cv2.namedWindow("preview")
+    vc = cv2.VideoCapture(0)
+    model = vggface()
+    vgg_face_descriptor = Model(inputs=model.layers[0].input, outputs=model.layers[-2].output)
+    face_detector = FaceDetector()
+    c=0
+    while vc.isOpened():
+        _, frame = vc.read()
+        rgb_img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        
+        timeF = frame_interval
+        if(c==0):
+            bboxes = face_detector.predict(rgb_img)
+            frame = process_frame(bboxes, frame, vgg_face_descriptor)   
+            ann_img = annotate_image(frame, bboxes)
+        c=(c+1)%timeF
+        key = cv2.waitKey(100)
+        cv2.imshow("preview", ann_img)
 
-    # Only process every other frame of video to save time
-    if process_this_frame:
-        # Find all the faces and face encodings in the current frame of video
-        face_locations = face_recognition.face_locations(rgb_small_frame)
-        face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
-        print(face_locations)
-        face_names = []
-        for face_encoding in face_encodings:
-            # See if the face is a match for the known face(s)
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            name = "Unknown"
+        if key == 27: # exit on ESC
+            break
+    cv2.destroyWindow("preview")
 
-            # If a match was found in known_face_encodings, just use the first one.
-            if True in matches:
-                first_match_index = matches.index(True)
-                name = known_face_names[first_match_index]
-
-            face_names.append(name)
-
-    process_this_frame = not process_this_frame
-
-
-    # Display the results
-    for (top, right, bottom, left), name in zip(face_locations, face_names):
-        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-        top *= 4
-        right *= 4
-        bottom *= 4
-        left *= 4
-
-        # Draw a box around the face
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-
+def process_frame(bboxes, frame, vgg_face_descriptor):
+    """
+    Determine whether the current frame contains the faces of people from our database
+    """
+    
+    for (x, y, w, h, prob) in bboxes:
+        x1 = int(x - w/2)
+        y1 = int(y - h/2)
+        x2 = int(x + w/2)
+        y2 = int(y + h/2)
+        identity = find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor)
         # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, identity, (x1 + 6, y2 - 6), font, 1.0, (255, 255, 255), 1)
 
-    # Display the resulting image
-    cv2.imshow('Video', frame)
+    return frame
 
-    # Hit 'q' on the keyboard to quit!
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+def find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor):
+    """
+    Determine whether the face contained within the bounding box exists in our database
 
-# Release handle to the webcam
-video_capture.release()
-cv2.destroyAllWindows()
+    x1,y1_____________
+    |                 |
+    |                 |
+    |_________________x2,y2
+
+    """
+    height, width, channels = frame.shape
+    # The padding is necessary since the OpenCV face detector creates the bounding box around the face and not the head
+    part_image = frame[max(0, y1):min(height, y2), max(0, x1):min(width, x2)]
+    #TODO FACE ALIGNMENT HERE
+    return who_is_it(part_image, database,vgg_face_descriptor)
+
+
+def who_is_it(image, database,vgg_face_descriptor,epsilon=0.4):
+    """
+    Arguments:
+    image_path -- path to an image
+    database -- database containing image encodings along with the name of the person on the image
+    model -- your Inception model instance in Keras
+    
+    Returns:
+    min_dist -- the minimum distance between image_path encoding and the encodings from the database
+    identity -- string, the name prediction for the person on image_path
+    """
+    encoding = vgg_face_descriptor.predict(preprocess_image(image))[0,:]
+    identity = "Unknown"
+    # Loop over the database dictionary's names and encodings.
+    i=0
+    for db_enc in database["encodings"]:
+        cosine_similarity = findCosineSimilarity(encoding, db_enc)
+        if cosine_similarity < epsilon:
+            identity = database["names"][i]
+            break
+        i+=1
+    return identity
+
+if __name__ == "__main__":
+    database = prepare_database()
+    webcam_face_recognizer(database)
+    
+
+
