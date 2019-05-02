@@ -5,3 +5,6 @@
 *.cubin
 *.fatbin
 training/weights
+faced/build
+faced/dist
+faced/faced.egg-info
