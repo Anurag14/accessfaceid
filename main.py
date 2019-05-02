@@ -1,3 +1,4 @@
+import face_alignment
 import cv2,os
 import numpy as np
 from faced import FaceDetector
@@ -30,6 +31,7 @@ def webcam_face_recognizer(database):
     vc = cv2.VideoCapture(0)
     model = vggface()
     vgg_face_descriptor = Model(inputs=model.layers[0].input, outputs=model.layers[-2].output)
+    face_alignment_predictor = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D,flip_input=False)
     face_detector = FaceDetector()
     c=0
     while vc.isOpened():
@@ -39,7 +41,7 @@ def webcam_face_recognizer(database):
         timeF = frame_interval
         if(c==0):
             bboxes = face_detector.predict(rgb_img)
-            frame = process_frame(bboxes, frame, vgg_face_descriptor)   
+            frame = process_frame(bboxes, frame, vgg_face_descriptor,face_aligment_predictor)   
             ann_img = annotate_image(frame, bboxes)
         c=(c+1)%timeF
         key = cv2.waitKey(100)
@@ -49,7 +51,7 @@ def webcam_face_recognizer(database):
             break
     cv2.destroyWindow("preview")
 
-def process_frame(bboxes, frame, vgg_face_descriptor):
+def process_frame(bboxes, frame, vgg_face_descriptor,face_alignment_predictor):
     """
     Determine whether the current frame contains the faces of people from our database
     """
@@ -59,11 +61,11 @@ def process_frame(bboxes, frame, vgg_face_descriptor):
         y1 = int(y - h/2)
         x2 = int(x + w/2)
         y2 = int(y + h/2)
-        identity = find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor)
+        identity = find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor,face_alignment_predictor)
         # Draw a label with a name below the face
-        cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(frame, (x1, y2), (x2, y2+30), (0, 255, 0), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, identity, (x1 + 6, y2 - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, identity, (x1 + 6, y2 + 18), font, 1.0, (255, 255, 255), 1)
 
     return frame
 
@@ -81,6 +83,8 @@ def find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor):
     # The padding is necessary since the OpenCV face detector creates the bounding box around the face and not the head
     part_image = frame[max(0, y1):min(height, y2), max(0, x1):min(width, x2)]
     #TODO FACE ALIGNMENT HERE
+    preds=face_alignment_predictor.get_landmarks(part_image)
+    part_image=execute_alignment(part_image,preds)
     return who_is_it(part_image, database,vgg_face_descriptor)
 
 
