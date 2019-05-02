@@ -4,7 +4,7 @@ import numpy as np
 from faced import FaceDetector
 from faced.utils import annotate_image
 from training.vggface import vggface
-from training.utils import preprocess_image,findCosineSimilarity
+from training.utils import preprocess_image,findCosineSimilarity,execute_alignment
 from keras.models import Model
 import tensorflow as tf
 def prepare_database():
@@ -41,7 +41,7 @@ def webcam_face_recognizer(database):
         timeF = frame_interval
         if(c==0):
             bboxes = face_detector.predict(rgb_img)
-            frame = process_frame(bboxes, frame, vgg_face_descriptor,face_aligment_predictor)   
+            frame = process_frame(bboxes, frame, vgg_face_descriptor,face_alignment_predictor)   
             ann_img = annotate_image(frame, bboxes)
         c=(c+1)%timeF
         key = cv2.waitKey(100)
@@ -69,7 +69,7 @@ def process_frame(bboxes, frame, vgg_face_descriptor,face_alignment_predictor):
 
     return frame
 
-def find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor):
+def find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor,face_alignment_predictor):
     """
     Determine whether the face contained within the bounding box exists in our database
 
