@@ -17,7 +17,7 @@ def prepare_database():
 
 
 
-frame_interval=2
+frame_interval=3
 def webcam_face_recognizer(database):
     """
     Runs a loop that extracts images from the computer's webcam and determines whether or not
@@ -82,9 +82,10 @@ def find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor,face_alignment_predi
     height, width, channels = frame.shape
     # The padding is necessary since the OpenCV face detector creates the bounding box around the face and not the head
     part_image = frame[max(0, y1):min(height, y2), max(0, x1):min(width, x2)]
-    #TODO FACE ALIGNMENT HERE
+    # FACE ALIGNMENT HERE
     preds=face_alignment_predictor.get_landmarks(part_image)
-    part_image=execute_alignment(part_image,preds)
+    if(preds!=[] and preds!=None):
+        part_image=execute_alignment(part_image,preds)
     return who_is_it(part_image, database,vgg_face_descriptor)
 
 
