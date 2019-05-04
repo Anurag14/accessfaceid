@@ -1,6 +1,6 @@
 # *accessfaceid*
 
-:dragon: CPU (Near) Real Time face detection alignment and verification
+:dragon: CPU (Near) Real Time face detection alignment and verification. As part of exploring frontiers in state of art and possiblities in face recognition at RBS i have hacked together a small module brewing all the good things i could find.
 
 <p align="center">
   <img src="faced/examples/demo_yolo.gif"/>
@@ -11,6 +11,8 @@
 ```bash
 $ git clone https://github.com/Anurag14/accessfaceid/
 $ pip install -r requirements.txt
+$ cd faced
+$ python setup.py install
 ```
 
 > Soon to be available on `PyPI`.
