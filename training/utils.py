@@ -1,9 +1,6 @@
 import cv2
 import numpy as np
-from configs import configs
-from keras.preprocessing.image import img_to_array
-from keras.applications.imagenet_utils import preprocess_input
-from keras.preprocessing import image
+
 """
     Face alignment utils 
 """
@@ -60,18 +57,3 @@ def execute_alignment(img,preds):
     M = get_rotation_matrix(left_eye, right_eye)
     rotated = cv2.warpAffine(img, M, (width, height), flags=cv2.INTER_CUBIC)
     return rotated
-"""
-    INSIGHT FACE MODEL utils
-"""
-def face_distance(face_encodings, face_to_compare):
-    if len(face_encodings) == 0:
-        return np.empty((0))
-    face_dist_value = np.linalg.norm(face_encodings - face_to_compare, axis=1)
-    print('[Face Services | face_distance] Distance between two faces is {}'.format(face_dist_value))
-    return face_dist_value
-
-
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=configs.face_similarity_threshold):
-    true_list = list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
-    similar_indx = list(np.where(true_list)[0])
-    return similar_indx
