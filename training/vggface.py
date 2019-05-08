@@ -49,5 +49,5 @@ def vggface(pretrained=True):
     model.add(Activation('softmax')) #doesn't support on older versions
     #model.add(Activation(tf.nn.softmax)) # use this on older version tensorflow
     if(pretrained==True):
-        model.load_weights('F:/RBS FaceReid/accessfaceid/training/weights/vgg_face_weights.h5')
+        model.load_weights('F:/RBS FaceReid/accessfaceid/pretrained/vgg_face_weights.h5')
     return model
