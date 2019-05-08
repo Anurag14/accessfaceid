@@ -17,13 +17,13 @@ def rect_to_tuple(rect):
     return left, top, right, bottom
 
 def extract_eye(shape, eye_indices):
-    points = map(lambda i: shape.part(i), eye_indices)
+    points = map(lambda i: shape[0][i], eye_indices)
     return list(points)
 
 def extract_eye_center(shape, eye_indices):
     points = extract_eye(shape, eye_indices)
-    xs = map(lambda p: p.x, points)
-    ys = map(lambda p: p.y, points)
+    xs = map(lambda p: p[0], points)
+    ys = map(lambda p: p[1], points)
     return sum(xs) // 6, sum(ys) // 6
 
 def extract_left_eye_center(shape):
@@ -58,9 +58,7 @@ def execute_alignment(img,preds):
 
     M = get_rotation_matrix(left_eye, right_eye)
     rotated = cv2.warpAffine(img, M, (width, height), flags=cv2.INTER_CUBIC)
-
-    cropped = crop_image(rotated, det)
-    return cropped
+    return rotated
 """
     VGG FACE MODEL utils
 """
