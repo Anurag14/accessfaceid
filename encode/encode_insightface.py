@@ -1,8 +1,9 @@
 import os
 import cv2
 import warnings
+import face_aligment
 from training.vggface import vggface
-from training.utils import preprocess_image
+from training.utils_vggface import preprocess_image
 import numpy as np
 from tqdm import tqdm
 from faced import FaceDetector
@@ -36,7 +37,7 @@ def process_and_encode(dataset):
         if len(encoding) > 0 : 
             known_encodings.append(encoding)
             known_names.append(name)
-    np.savez('data/encodings/encoding.npz',encodings=known_encodings,names=known_names)
+    np.savez('../data/encodings/encoding_vggface.npz',encodings=known_encodings,names=known_names)
     return 
 
 if __name__ == "__main__":

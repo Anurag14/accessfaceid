@@ -1,15 +1,16 @@
 import face_alignment
 import cv2,os
 import numpy as np
+from configs import configs
 from faced import FaceDetector
 from faced.utils import annotate_image
-from training.vggface import vggface
-from training.utils import preprocess_image,findCosineSimilarity,execute_alignment
-from keras.models import Model
+from training.insight_face import InsightFace
+from training.utils_alignment import execute_alignment
+from training.utils_insightface import get_embedding
 import tensorflow as tf
 def prepare_database():
     print("[LOG] Loading Encoded faces ...")
-    file = np.load('data/encodings/encoding.npz')
+    file = np.load('data/encodings/encoding_vggface.npz')
     known_face_encodings=file["encodings"]
     known_face_names = file["names"]
     database={"names":known_face_names,"encodings":known_face_encodings}
@@ -29,8 +30,11 @@ def webcam_face_recognizer(database):
 
     cv2.namedWindow("preview")
     vc = cv2.VideoCapture(0)
-    model = vggface()
-    vgg_face_descriptor = Model(inputs=model.layers[0].input, outputs=model.layers[-2].output)
+    face_descriptor = InsightFace(model_fp=configs.face_descriptors_model_fp, 
+                                    input_tensor_names=configs.face_descriptors_input_names,
+                                    output_tensor_names=configs.face_descriptors_output_names,
+                                    device=configs.face_descriptors_device)
+    
     face_alignment_predictor = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D,flip_input=False)
     face_detector = FaceDetector()
     c=0
@@ -41,7 +45,7 @@ def webcam_face_recognizer(database):
         timeF = frame_interval
         if(c==0):
             bboxes = face_detector.predict(rgb_img)
-            frame = process_frame(bboxes, frame, vgg_face_descriptor,face_alignment_predictor)   
+            frame = process_frame(bboxes, frame, face_descriptor, face_alignment_predictor)   
             ann_img = annotate_image(frame, bboxes)
         c=(c+1)%timeF
         key = cv2.waitKey(100)
@@ -51,7 +55,7 @@ def webcam_face_recognizer(database):
             break
     cv2.destroyWindow("preview")
 
-def process_frame(bboxes, frame, vgg_face_descriptor,face_alignment_predictor):
+def process_frame(bboxes, frame, face_descriptor,face_alignment_predictor):
     """
     Determine whether the current frame contains the faces of people from our database
     """
@@ -61,7 +65,7 @@ def process_frame(bboxes, frame, vgg_face_descriptor,face_alignment_predictor):
         y1 = int(y - h/2)
         x2 = int(x + w/2)
         y2 = int(y + h/2)
-        identity = find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor,face_alignment_predictor)
+        identity = find_identity(frame, x1, y1, x2, y2,face_descriptor,face_alignment_predictor)
         # Draw a label with a name below the face
         cv2.rectangle(frame, (x1, y2), (x2, y2+30), (0, 255, 0), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
@@ -69,7 +73,7 @@ def process_frame(bboxes, frame, vgg_face_descriptor,face_alignment_predictor):
 
     return frame
 
-def find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor,face_alignment_predictor):
+def find_identity(frame, x1, y1, x2, y2,face_descriptor,face_alignment_predictor):
     """
     Determine whether the face contained within the bounding box exists in our database
 
@@ -83,13 +87,14 @@ def find_identity(frame, x1, y1, x2, y2,vgg_face_descriptor,face_alignment_predi
     # The padding is necessary since the OpenCV face detector creates the bounding box around the face and not the head
     part_image = frame[max(0, y1):min(height, y2), max(0, x1):min(width, x2)]
     # FACE ALIGNMENT HERE
-    preds=face_alignment_predictor.get_landmarks(part_image)
-    if(preds!=[] and preds!=None):
-        part_image=execute_alignment(part_image,preds)
-    return who_is_it(part_image, database,vgg_face_descriptor)
+    landmarks=face_alignment_predictor.get_landmarks(part_image)
+    if(landmarks!=[] and landmarks!=None):
+        part_image=execute_alignment(part_image,landmarks)
+    prediction=get_embedding(part_image,face_descriptor)
+    return who_is_it(database,prediction)
+        
 
-
-def who_is_it(image, database,vgg_face_descriptor,epsilon=0.4):
+def who_is_it(database,encoding,epsilon=800):
     """
     Arguments:
     image_path -- path to an image
@@ -100,12 +105,11 @@ def who_is_it(image, database,vgg_face_descriptor,epsilon=0.4):
     min_dist -- the minimum distance between image_path encoding and the encodings from the database
     identity -- string, the name prediction for the person on image_path
     """
-    encoding = vgg_face_descriptor.predict(preprocess_image(image))[0,:]
     identity = "Unknown"
     # Loop over the database dictionary's names and encodings.
     i=0
     for db_enc in database["encodings"]:
-        cosine_similarity = findCosineSimilarity(encoding, db_enc)
+        cosine_similarity=face_compare(encoding, db_enc)
         if cosine_similarity < epsilon:
             identity = database["names"][i]
             break

@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 from keras.preprocessing.image import img_to_array
 from keras.applications.imagenet_utils import preprocess_input
