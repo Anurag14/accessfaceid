@@ -32,10 +32,15 @@ def process_and_encode(dataset):
             continue
         (x,y,w,h,prob)=boxes[0]
         #TODO align faces
-        part_image=preprocess_image(image[int(x - w/2):int(x + w/2),int(y - h/2):int(y + h/2)])
+        x1 = int(x - w/2)
+        y1 = int(y - h/2)
+        x2 = int(x + w/2)
+        y2 = int(y + h/2)
+        part_image = image[y1:y2,x1:x2]
         landmarks=face_alignment_predictor.get_landmarks(part_image)
         if(landmarks!=[] and landmarks!=None):
             part_image=execute_alignment(part_image,landmarks)
+        part_image=preprocess_image(part_image)
         encoding = vgg_face_descriptor.predict(part_image)[0,:]
         # the person's name is the name of the folder where the image comes from
         name = image_path.split(os.path.sep)[-2]
