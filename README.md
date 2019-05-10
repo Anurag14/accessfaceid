@@ -6,13 +6,34 @@
   <img src="faced/examples/demo_yolo.gif"/>
 </p>
 
-## How to run
+## How to run from source
 
 ```bash
 $ git clone https://github.com/Anurag14/accessfaceid/
 $ pip install -r requirements.txt
 $ cd faced
 $ python setup.py install
+$ cd ../training
+$ mkdir weights
+$ cd weights
+$ cp <download destination of vggface weights> .
+$ cd ../../
+$ python encode.py
+$ python main.py
+```
+## How to run a release
+Download the release from [here](https://github.com/Anurag14/accessfaceid/releases/tag/beta) then 
+```bash
+$ pip install -r requirements.txt
+$ cd faced
+$ python setup.py install
+$ cd ../training
+$ mkdir weights
+$ cd weights
+$ cp <download destination of vggface weights> .
+$ cd ../../
+$ python encode.py
+$ python main.py
 ```
 
 > Soon to be available on `PyPI`.
@@ -145,5 +166,4 @@ Just install `tensorflow-gpu` instead of `tensorflow`.
 Models will be improved and uploaded.
 
 **This is not a Production ready system. Use it at your own risk.**
-
 
