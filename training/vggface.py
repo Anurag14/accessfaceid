@@ -2,7 +2,7 @@ from keras.models import Model, Sequential
 from keras.layers import Input, Convolution2D, ZeroPadding2D, MaxPooling2D, Flatten, Dense, Dropout, Activation
 from keras.models import model_from_json
 #import tensorflow as tf #add this for older version tensorflow
-def vggface(pretrained=True):
+def vggface(pretrained=True,path='training/weights/vgg_face_weights.h5'):
     model = Sequential()
     model.add(ZeroPadding2D((1,1),input_shape=(224,224, 3)))
     model.add(Convolution2D(64, (3, 3), activation='relu'))
@@ -49,5 +49,7 @@ def vggface(pretrained=True):
     model.add(Activation('softmax')) #doesn't support on older versions
     #model.add(Activation(tf.nn.softmax)) # use this on older version tensorflow
     if(pretrained==True):
-        model.load_weights('F:/RBS FaceReid/accessfaceid/pretrained/vgg_face_weights.h5')
+        model.load_weights(path)
     return model
+if __name__=="__main__":
+    vggface(path='weights/vgg_face_weights.h5')
