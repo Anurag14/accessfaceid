@@ -2,9 +2,9 @@
 A dummy db storaing faces in memory
 Feel free to make it fancier like hooking with postgres or whatever
 This model here is just for simple demo app under apps
-Don't use it for production dude.
+Don't use it for production.
 '''
-from services import face_services
+
 import numpy as np
 
 
@@ -16,7 +16,15 @@ class Model(object):
     def add_face(self, face_img, face_description):
         self.faces.append(face_img)
         self.faces_discriptions.append(face_description)
-
+    
+    def load_database(model_name):
+        print("[LOG] Loading Encoded faces ...")
+        file = np.load('data/encodings/encoding_'+model_name+'.npz')
+        known_face_encodings=file["encodings"]
+        known_face_names = file["names"]
+        database={"names":known_face_names,"encodings":known_face_encodings}
+        return database
+    
     def drop_all(self):
         self.faces = []
         self.faces_discriptions = []
