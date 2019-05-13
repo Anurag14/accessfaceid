@@ -1,6 +1,11 @@
 import os
-
-BASE_PATH = '/'.join(os.getcwd().split('/')[:-1]) # Using ubuntu machine may require removing this -1
+import sys import platform
+if platform == "win32":
+    BASE_PATH = '/'.join(os.getcwd().split('\\')) 
+elif platform == "linux":
+    BASE_PATH = '/'.join(os.getcwd().split('/')[:-1]) # Using ubuntu machine may require removing this -1
+else:
+    BASE_PATH = '/'.join(os.getcwd().split('/')[:-1]) 
 face_describer_input_tensor_names = ['img_inputs:0', 'dropout_rate:0']
 face_describer_output_tensor_names = ['resnet_v1_50/E_BN2/Identity:0']
 face_describer_device = '/cpu:0'
