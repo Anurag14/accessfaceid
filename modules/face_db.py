@@ -12,11 +12,12 @@ class Model(object):
 
     faces = []
     faces_discriptions = []
-
-    def add_face(self, face_img, face_description):
+    faces_names = []
+    def add_face(self, face_img, face_description,name):
         self.faces.append(face_img)
         self.faces_discriptions.append(face_description)
-    
+        self.faces_names.append(name)
+
     def load_database(model_name):
         print("[LOG] Loading Encoded faces ...")
         file = np.load('data/encodings/encoding_'+model_name+'.npz')
