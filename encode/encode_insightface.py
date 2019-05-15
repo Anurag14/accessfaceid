@@ -1,23 +1,18 @@
+import sys
+
+sys.path.insert(0,'.')
 import os
 import cv2
-import warnings
-<<<<<<< HEAD:encode/encode_insightface.py
-import face_aligment
-from training.vggface import vggface
-from training.utils_vggface import preprocess_image
-=======
+import tables
 import face_alignment
-from training.vggface import vggface
-from training.utils import preprocess_image,execute_alignment
->>>>>>> master:encode.py
 import numpy as np
-from tqdm import tqdm
-from faced import FaceDetector
-from keras.models import Model
-def process_and_encode(dataset):
+from modules import face_track_server, face_describer_server
+from utils.utils_alignment import execute_alignment
+from configs import configs
+def process_and_encode(dataset,filename):
     print("[LOG] Collecting images ...")
     images = []
-    for direc, _, files in tqdm(os.walk(dataset)):
+    for direc, _, files in os.walk(dataset):
         for file in files:
             if file.endswith("jpg"):
                 images.append(os.path.join(direc,file))
@@ -25,36 +20,43 @@ def process_and_encode(dataset):
     known_encodings = []
     known_names = []
     print("[LOG] Encoding faces ...")
-    model=vggface()
-    vgg_face_descriptor = Model(inputs=model.layers[0].input, outputs=model.layers[-2].output)
-    face_detector = FaceDetector()
+    face_descriptor = face_describer_server.FDServer(
+                model_fp=configs.face_describer_model_fp,
+                input_tensor_names=configs.face_describer_input_tensor_names,
+                output_tensor_names=configs.face_describer_output_tensor_names,
+                device=configs.face_describer_device)
+    face_detector = face_track_server.FaceTrackServer(down_scale_factor=1)
     face_alignment_predictor = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D,flip_input=False)
-    for image_path in tqdm(images):
+    names=[]
+    encodings=[]
+    i=0
+    for image_path in images:
+        print(f'i:{i}')
+        i+=1
         image = cv2.imread(image_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        boxes = face_detector.predict(image)
-        if(boxes==[]):
-            warnings.warn('system could not detect face in this image %s'%(image_path))
+        face_detector.process(image,called_from_encode=False)
+        face = face_detector.get_faces()
+
+        face_descriptions = []
+        num_faces = len(face)
+        if num_faces == 0:
+            print(f'Warning no face in the image for the image path {image_path}\n')
             continue
-        (x,y,w,h,prob)=boxes[0]
-        #TODO align faces
-        x1 = int(x - w/2)
-        y1 = int(y - h/2)
-        x2 = int(x + w/2)
-        y2 = int(y + h/2)
-        part_image = image[y1:y2,x1:x2]
-        landmarks=face_alignment_predictor.get_landmarks(part_image)
-        if(landmarks!=[] and landmarks!=None):
-            part_image=execute_alignment(part_image,landmarks)
-        part_image=preprocess_image(part_image)
-        encoding = vgg_face_descriptor.predict(part_image)[0,:]
+        face=face[0]
+        print("[ALIGNMENT]-------STARTS")
+        landmarks=face_alignment_predictor.get_landmarks(face)
+        if(landmarks!=None):
+            face=execute_alignment(face,landmarks)
+        print("[ALIGNMENT]-------ENDS")
+        face_resize = cv2.resize(face, configs.face_describer_tensor_shape)
+        data_feed = [np.expand_dims(face_resize, axis=0), configs.face_describer_drop_out_rate]
+        encoding = face_descriptor.inference(data_feed)[0][0]
         # the person's name is the name of the folder where the image comes from
-        name = image_path.split(os.path.sep)[-2]
-        if len(encoding) > 0 : 
-            known_encodings.append(encoding)
-            known_names.append(name)
-    np.savez('../data/encodings/encoding_vggface.npz',encodings=known_encodings,names=known_names)
+        names.append(image_path.split(os.path.sep)[-2])
+        encodings.append(encoding)
+    np.savez(filename,known_enocoding=encodings,known_names=names)
     return 
 
 if __name__ == "__main__":
-   process_and_encode('data/faces') 
+    filename = 'data/encodings/encoding_insightface.npz'
+    process_and_encode('data/faces',filename) 

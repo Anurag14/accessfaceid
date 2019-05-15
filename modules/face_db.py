@@ -10,9 +10,7 @@ import numpy as np
 
 class Model(object):
 
-    faces = []
-    faces_discriptions = []
-    faces_names = []
+    
     def add_face(self, face_img, face_description,name):
         self.faces.append(face_img)
         self.faces_discriptions.append(face_description)
