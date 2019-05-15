@@ -34,7 +34,7 @@ class FaceTrackServer(object):
         self.face_locations = []
         self.faces = []
 
-    def process(self, frame):
+    def process(self, frame, called_from_encode=False):
         self.reset()
         self.cam_h, self.cam_w, _ = frame.shape
         # Resize frame of video to 1/4 size for faster face recognition processing
@@ -69,7 +69,8 @@ class FaceTrackServer(object):
             self.face_relative_locations.append([x1_rltv, y1_rltv, x2_rltv, y2_rltv])
             # cv2.imshow('faces', frame[y1:y2, x1:x2, :])
             # cv2.waitKey(0)
-        print('[FaceTracker Server] Found {} faces!'.format(len(self.faces)))
+        if(called_from_encode==False):
+            print('[FaceTracker Server] Found {} faces!'.format(len(self.faces)))
         return self.faces
 
     def get_faces_loc(self, relative=True):
