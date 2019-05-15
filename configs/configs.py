@@ -1,5 +1,5 @@
 import os
-import sys import platform
+from sys import platform
 if platform == "win32":
     BASE_PATH = '/'.join(os.getcwd().split('\\')) 
 elif platform == "linux":
