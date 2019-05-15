@@ -6,6 +6,10 @@ from keras.preprocessing import image
 """
     VGG FACE MODEL utils
 """
+def get_embedding(part_image,face_descriptor,dropout_rate=0.5):
+    input_data=[np.expand(part_image,axis=0),dropout_rate]
+    prediction=face_descriptor.inference(data=input_data)
+    return prediction
 def preprocess_image(img):
     img = cv2.resize(img,(224, 224))
     img = img_to_array(img)

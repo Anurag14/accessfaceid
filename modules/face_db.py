@@ -4,7 +4,7 @@ Feel free to make it fancier like hooking with postgres or whatever
 This model here is just for simple demo app under apps
 Don't use it for production.
 '''
-
+from utils.utils_insightface import compare_faces
 import numpy as np
 
 
@@ -37,7 +37,7 @@ class Model(object):
         if len(self.faces) == 0:
             return []
         # Use items in Python 3*, below is by default for Python 2*
-        similar_face_idx = face_services.compare_faces(self.faces_discriptions, face_description)
+        similar_face_idx = compare_faces(self.faces_discriptions, face_description)
         similar_faces = np.array(self.faces)[similar_face_idx]
         num_similar_faces = len(similar_faces)
         print('[Face DB] Found {} similar faces in a DataBase of {} faces...'.format(num_similar_faces, len(self.faces)))

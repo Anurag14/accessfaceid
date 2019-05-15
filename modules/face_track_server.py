@@ -1,5 +1,4 @@
 import cv2
-#import face_recognition
 from faced import FaceDetector
 '''
 This server:
@@ -44,7 +43,6 @@ class FaceTrackServer(object):
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
         rgb_small_frame = small_frame[:, :, ::-1]
         face_annotations = self.face_detector.predict(rgb_small_frame)
-        #self.face_locations= face_recognition.face_locations(rgb_small_frame)
         # Display the results
         for (x, y, w, h, prob) in face_annotations:
             x1 = int(x - w/2)
