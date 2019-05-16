@@ -11,33 +11,32 @@ import numpy as np
 class Model(object):
 
     
-    def add_face(self, face_img, face_description,name):
-        self.faces.append(face_img)
+    def add_face(self,face_description,name):
         self.faces_discriptions.append(face_description)
         self.faces_names.append(name)
+        np.savez(self.filename,encodings=self.faces_descriptions,names=self.faces_names)
 
-    def load_database(model_name):
-        print("[LOG] Loading Encoded faces ...")
-        file = np.load('data/encodings/encoding_'+model_name+'.npz')
-        known_face_encodings=file["encodings"]
-        known_face_names = file["names"]
-        database={"names":known_face_names,"encodings":known_face_encodings}
-        return database
+    def __init__(self,model_name='insightface'):
+        print("[LOG] Loading Encoded faces Database ...")
+        self.filename='data/encodings/encoding_'+model_name+'.npz'
+        file=np.load(self.filename)
+        self.faces_descriptions=file["encodings"]
+        self.faces_names = file["names"]
     
     def drop_all(self):
-        self.faces = []
+        self.faces_names = []
         self.faces_discriptions = []
 
     def get_all(self):
-        return self.faces, self.faces_discriptions
+        return self.faces_names, self.faces_discriptions
 
     def get_similar_faces(self, face_description):
-        print('[Face DB] Looking for similar faces in a DataBase of {} faces...'.format(len(self.faces)))
-        if len(self.faces) == 0:
+        print('[Face DB] Looking for similar faces in a DataBase of {} faces...'.format(len(self.faces_names)))
+        if len(self.faces_names) == 0:
             return []
         # Use items in Python 3*, below is by default for Python 2*
         similar_face_idx = compare_faces(self.faces_discriptions, face_description)
-        similar_faces = np.array(self.faces)[similar_face_idx]
-        num_similar_faces = len(similar_faces)
-        print('[Face DB] Found {} similar faces in a DataBase of {} faces...'.format(num_similar_faces, len(self.faces)))
-        return similar_faces
+        nameof_similar_faces = np.array(self.faces_names)[similar_face_idx]
+        num_similar_faces = len(nameof_similar_faces)
+        print('[Face DB] Found {} similar faces in a DataBase of {} faces...'.format(num_similar_faces, len(self.faces_names)))
+        return nameof_similar_faces
