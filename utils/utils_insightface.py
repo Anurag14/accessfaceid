@@ -17,16 +17,18 @@ def face_distance_min(face_enodings, face_to_compare):
     return np.min(face_dist_value)
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=configs.face_similarity_threshold):
+def compare_faces_pp(known_face_encodings, face_encoding_to_check, tolerance=configs.face_similarity_threshold):
     Processes=[]
     length_of_db=len(known_face_encodings)
-    no_of_process=mp.cpu_count()-1
+    no_of_process=mp.cpu_count()
     for i in range(no_of_process):
         start=i*(length_of_db/no_of_process)
         end = length_of_db if i==no_of_process-1 else (i+1)*(length_of_db/no_of_process)
         process = mp.Process(target=face_distance_min, args=(known_face_encodings[start:end],face_to_compare,))
         process.start()
         Processes.append(process)
+
+def compare_faces(known_face_encodings,face_encodings_to_check,tolerance=configs.face_similarity_threshold):
     true_list = list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
     similar_indx = list(np.where(true_list)[0])
     return similar_indx
