@@ -34,14 +34,20 @@ class Model(object):
     def get_all(self):
         return self.faces_names, self.faces_discriptions
 
-    def get_similar_faces(self, face_description,mode='min'):
-        assert mode=='min' or mode=='majority'
-        print('[Face DB] Looking for similar faces in a DataBase of {} faces...'.format(len(self.faces_names)))
-        if len(self.faces_names) == 0:
+    #This method will be deprecated
+    def get_similar_faces(self, face_description):
+        print('[Face DB] Looking for similar faces in a DataBase of {} faces...'.format(len(self.faces)))
+        if len(self.faces) == 0:
             return []
         # Use items in Python 3*, below is by default for Python 2*
-        similar_face_idx = compare_faces_pp(self.faces_descriptions, face_description,mode)
         nameof_similar_faces = np.array(self.faces_names)[similar_face_idx]
         num_similar_faces = len(nameof_similar_faces)
         print('[Face DB] Found {} similar faces in a DataBase of {} faces...'.format(num_similar_faces, len(self.faces_names)))
         return nameof_similar_faces
+    
+    def who_is_this_face(self,face_description,mode='min'):
+        assert mode=='min' or mode=='majority'
+        if len(self.faces_names) == 0:
+            return "Unknown"
+        who_is_this = compare_faces_pp(self.faces_descriptions, face_description, mode)
+        return who_is_this
