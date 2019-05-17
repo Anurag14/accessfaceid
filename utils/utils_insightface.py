@@ -28,7 +28,7 @@ def compare_faces_pp(known_face_encodings, face_encoding_to_check, tolerance=con
         process.start()
         Processes.append(process)
 
-def compare_faces(known_face_encodings,face_encodings_to_check,tolerance=configs.face_similarity_threshold):
+def compare_faces(known_face_encodings, face_encodings_to_check, tolerance=configs.face_similarity_threshold):
     true_list = list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
     similar_indx = list(np.where(true_list)[0])
     return similar_indx
