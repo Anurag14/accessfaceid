@@ -54,9 +54,10 @@ def process_and_encode(dataset,filename):
         # the person's name is the name of the folder where the image comes from
         names.append(image_path.split(os.path.sep)[-2])
         encodings.append(encoding)
-    np.savez(filename,known_enocoding=encodings,known_names=names)
+    np.save(filename+'_data.npy',encodings)
+    np.save(filename+'_name.npy',names)
     return 
 
 if __name__ == "__main__":
-    filename = 'data/encodings/encoding_insightface.npz'
+    filename = 'data/encodings/encoding_insightface'
     process_and_encode('data/faces',filename) 
