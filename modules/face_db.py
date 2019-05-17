@@ -14,14 +14,18 @@ class Model(object):
     def add_face(self,face_description,name):
         self.faces_discriptions.append(face_description)
         self.faces_names.append(name)
-        np.savez(self.filename,encodings=self.faces_descriptions,names=self.faces_names)
+        f_handle = file(self.filename+'_data.npy','a')
+        np.save(f_handle,faces_description)
+        f_handle.close()
+        f_handle = file(self,filename+'_names.npy','a')
+        np.save(f_handle,faces_names)
+        f_handle.close()
 
     def __init__(self,model_name='insightface'):
         print("[LOG] Loading Encoded faces Database ...")
-        self.filename='data/encodings/encoding_'+model_name+'.npz'
-        file=np.load(self.filename)
-        self.faces_descriptions=file["encodings"]
-        self.faces_names = file["names"]
+        self.filename='data/encodings/encoding_'+model_name
+        self.faces_descriptions=np.load(self.filename+'_data.npy')
+        self.faces_names = np.load(self.filename+'_names.npy')
     
     def drop_all(self):
         self.faces_names = []
