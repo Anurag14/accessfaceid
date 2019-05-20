@@ -5,12 +5,13 @@ import multiprocessing as mp
 """
     INSIGHT FACE MODEL utils
 """
-def face_distance(face_encodings, face_to_compare):
+def face_distance(face_encodings, names, face_query):
     if len(face_encodings) == 0:
         return np.empty((0))
-    face_dist_value = np.linalg.norm(face_encodings - face_to_compare, axis=1)
-    #print('[Face Services | face_distance] Distance between two faces is {}'.format(face_dist_value))
-    return face_dist_value
+    face_dist_value = np.linalg.norm(face_encodings - face_query, axis=1)
+    index = np.argmin(face_dist_value)
+    print(f'which index is minimun: {index} and value is {face_dist_value[index]}')
+    return face_dist_value[index],names[index]
 
 def face_distance_min(e_chunk, n_chunk, face_query, tolerance=configs.face_similarity_threshold):
 
@@ -27,11 +28,16 @@ def face_distance_majority(e_chunk, n_chunk, face_query, tolerance=configs.face_
     true_list = list(face_dist_value <= tolerance)
     name_list = names[np.where(true_list)[0]]
     return name_list
-
+"""
+    Compare faces parallel process is the module that implements parallel processing of finding the 
+    closest image in the data base below the pre defined threshold for the query
+"""
 def compare_faces_pp(known_face_encodings, names, face_query, mode, tolerance=configs.face_similarity_threshold):
     chunks=[]
     results=[]
     length_of_db=len(known_face_encodings)
+    if length_of_db==0:
+        return "unknown"
     processes=mp.cpu_count()
     for i in range(processes):
         start=int(i*(length_of_db/processes))
@@ -45,9 +51,9 @@ def compare_faces_pp(known_face_encodings, names, face_query, mode, tolerance=co
     else:
         return mode(results)
 
-def compare_faces(known_face_encodings, face_query, tolerance=configs.face_similarity_threshold):
-    if len(face_encodings) == 0:
-        return np.empty((0))
-    true_list = list(face_distance(known_face_encodings, face_query) <= tolerance)
-    similar_indx = list(np.where(true_list)[0])
-    return similar_indx
+def compare_faces(known_face_encodings, names, face_query, tolerance=configs.face_similarity_threshold):
+    if len(known_face_encodings) == 0:
+        return "unknown"
+    face_value,name= face_distance(known_face_encodings, names, face_query)
+    name = name if face_value<= tolerance else "unknown"
+    return name

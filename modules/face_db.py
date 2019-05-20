@@ -4,7 +4,7 @@ Feel free to make it fancier like hooking with postgres or whatever
 This model here is just for simple demo app under apps
 Don't use it for production.
 '''
-from utils.utils_insightface import compare_faces_pp
+from utils.utils_insightface import compare_faces_pp, compare_faces
 import numpy as np
 
 
@@ -12,14 +12,12 @@ class Model(object):
 
     
     def add_face(self,face_description,name):
-        self.faces_descriptions.append(face_description)
-        self.faces_names.append(name)
-        f_handle = file(self.filename+'_data.npy','a')
-        np.save(f_handle,faces_description)
-        f_handle.close()
-        f_handle = file(self,filename+'_name.npy','a')
-        np.save(f_handle,faces_names)
-        f_handle.close()
+        self.faces_descriptions = np.append(self.faces_descriptions,face_description)
+        self.faces_names = np.append(self.faces_names,name)
+
+        
+        np.save(self.filename+'_data,py',self.faces_descriptions)
+        np.save(self.filename+'_name.npy',self.faces_names)
 
     def __init__(self,model_name='insightface'):
         print("[LOG] Loading Encoded faces Database ...")
@@ -48,7 +46,7 @@ class Model(object):
     def who_is_this_face(self,face_description,cores='single',mode='min'):
         assert cores =='single' or cores =='multi'
         if len(self.faces_names) == 0:
-            return "Unknown"
+            return "unknown"
         if cores == 'multi':
             assert mode == 'min' or mode == 'majority'
             who_is_this = compare_faces_pp(self.faces_descriptions, self.faces_names, face_description,mode)
