@@ -16,7 +16,7 @@ class Model(object):
         self.faces_names = np.append(self.faces_names,name)
 
         
-        np.save(self.filename+'_data,py',self.faces_descriptions)
+        np.save(self.filename+'_data.npy',self.faces_descriptions)
         np.save(self.filename+'_name.npy',self.faces_names)
 
     def __init__(self,model_name='insightface'):
