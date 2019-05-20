@@ -12,7 +12,7 @@ class Model(object):
 
     
     def add_face(self,face_description,name):
-        self.faces_descriptions = np.append(self.faces_descriptions,face_description)
+        self.faces_descriptions = np.append(self.faces_descriptions,[face_description],axis=0)
         self.faces_names = np.append(self.faces_names,name)
 
         
