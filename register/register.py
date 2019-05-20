@@ -55,8 +55,8 @@ class Register(camera_server.CameraServer):
 
             # Step3. For each face, check whether there are similar faces and if not save it to db.
             # Below naive and verbose implementation is to tutor you how this work
-            _similar_faces_names = self.face_db.get_similar_faces(_face_description)
-            if len(_similar_faces_names) == 0 or len(self.face_db.faces_names) == 0:
+            _similar_face_name = self.face_db.who_is_this_face(_face_description)
+            if _similar_face_name == "unknown" or len(self.face_db.faces_names) == 0:
                 self.enter_face(_face_description)
             
             print('[Live Streaming] -----------------------------------------------------------')

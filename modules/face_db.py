@@ -49,5 +49,5 @@ class Model(object):
         assert mode=='min' or mode=='majority'
         if len(self.faces_names) == 0:
             return "Unknown"
-        who_is_this = compare_faces_pp(self.faces_descriptions, face_description, mode)
+        who_is_this = compare_faces_pp(self.faces_descriptions, self.faces_names, face_description,mode)
         return who_is_this
