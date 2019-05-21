@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0,'.')
 import cv2
 import numpy as np
-from models import face_track_server, face_describer_server, face_db, camera_server
+from modules import face_track_server, face_describer_server, face_db, camera_server
 from configs import configs
 
 '''
