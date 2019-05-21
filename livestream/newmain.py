@@ -39,6 +39,8 @@ class Demo(camera_server.CameraServer):
         _names = []
         _num_faces = len(_faces)
         if _num_faces == 0:
+            #only display the frame in the feed no need to do anythine else
+            self._viz_faces([],[],frame)
             return
         for _face in _faces:
             _face_resize = cv2.resize(_face, configs.face_describer_tensor_shape)
@@ -48,10 +50,10 @@ class Demo(camera_server.CameraServer):
 
             # Step4. For each face, check whether get its name
             # Below naive and verbose implementation is to tutor you how this work
-            _similar_face_name = self.face_db.get_similar_faces(_face_description)
+            _similar_face_name = self.face_db.who_is_this_face(_face_description)
             _names.append(_similar_face_name)
         #Step5. Visualize all the faces in the frame
-        self._viz_faces(_face_loc,_names, frame)
+        self._viz_faces(_faces_loc,_names, frame)
         print('[Demo] -----------------------------------------------------------')
 
     def _viz_faces(self, faces_loc, names, frame):
@@ -64,7 +66,7 @@ class Demo(camera_server.CameraServer):
             # Draw a filled rectangle below bounding box for writing name
             cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
             # Write name
-            cv2.putText(img,names[i],(x1 + 6, y2 - 6),cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 255, 255), 1)
+            cv2.putText(frame,names[i],(x1 + 6, y2 - 6),cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 255, 255), 1)
         cv2.imshow('faces', frame)
         cv2.waitKey(1)
 
