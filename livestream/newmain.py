@@ -14,11 +14,11 @@ Main logics is in the process function, where you can further customize.
 '''
 
 
-class Demo(camera_server.CameraServer):
+class LiveStream(camera_server.CameraServer):
 
     def __init__(self, *args, **kwargs):
-        super(Demo, self).__init__(*args, **kwargs)
-        self.face_tracker = face_track_server.FaceTrackServer()
+        super(LiveStream, self).__init__(*args, **kwargs)
+        self.face_tracker = face_track_server.FaceTrackServer(down_scale_factor=0.5)
         self.face_describer = face_describer_server.FDServer(
             model_fp=configs.face_describer_model_fp,
             input_tensor_names=configs.face_describer_input_tensor_names,
@@ -54,7 +54,7 @@ class Demo(camera_server.CameraServer):
             _names.append(_similar_face_name)
         #Step5. Visualize all the faces in the frame
         self._viz_faces(_faces_loc,_names, frame)
-        print('[Demo] -----------------------------------------------------------')
+        print('[Live Streaming] -----------------------------------------------------------')
 
     def _viz_faces(self, faces_loc, names, frame):
         for i in range(len(names)):
@@ -62,16 +62,19 @@ class Demo(camera_server.CameraServer):
             y1 = int(faces_loc[i][1] * self.face_tracker.cam_h)
             x2 = int(faces_loc[i][2] * self.face_tracker.cam_w)
             y2 = int(faces_loc[i][3] * self.face_tracker.cam_h)
+            #size of fill rectangle is to made in proportion with the bbox
+            height = int((y2-y1)*0.25)
+            fontsize = height/50
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
             # Draw a filled rectangle below bounding box for writing name
-            cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), (0, 0, 255), cv2.FILLED)
+            cv2.rectangle(frame, (x1, y2), (x2, y2+height), (0, 0, 255), cv2.FILLED)
             # Write name
-            cv2.putText(frame,names[i],(x1 + 6, y2 - 6),cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 255, 255), 1)
+            cv2.putText(frame,names[i],(x1, y2+ int(height/2)),cv2.FONT_HERSHEY_SIMPLEX, fontsize,(255, 255, 255), 1)
         cv2.imshow('faces', frame)
         cv2.waitKey(1)
 
 
 if __name__ == '__main__':
-    demo = Demo(camera_address=0)
-    demo.run()
+    livestream = LiveStream(camera_address=0)
+    livestream.run()
 
