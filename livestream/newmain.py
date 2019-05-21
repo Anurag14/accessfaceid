@@ -62,11 +62,14 @@ class LiveStream(camera_server.CameraServer):
             y1 = int(faces_loc[i][1] * self.face_tracker.cam_h)
             x2 = int(faces_loc[i][2] * self.face_tracker.cam_w)
             y2 = int(faces_loc[i][3] * self.face_tracker.cam_h)
+            #size of fill rectangle is to made in proportion with the bbox
+            height = int((y2-y1)*0.25)
+            fontsize = height/50
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
             # Draw a filled rectangle below bounding box for writing name
-            cv2.rectangle(frame, (x1, y2), (x2, y2+35), (0, 0, 255), cv2.FILLED)
+            cv2.rectangle(frame, (x1, y2), (x2, y2+height), (0, 0, 255), cv2.FILLED)
             # Write name
-            cv2.putText(frame,names[i],(x1 + 6, y2+ 6),cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 255, 255), 1)
+            cv2.putText(frame,names[i],(x1, y2+ int(height/2)),cv2.FONT_HERSHEY_SIMPLEX, fontsize,(255, 255, 255), 1)
         cv2.imshow('faces', frame)
         cv2.waitKey(1)
 
