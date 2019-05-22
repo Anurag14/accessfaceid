@@ -5,7 +5,8 @@
 <p align="center">
   <img src="faced/examples/demo_yolo.gif"/>
 </p>
-
+## Weights for the model
+All weights for pretrained model of vggface (used in Release 1 and Release 2) are [here](https://drive.google.com/file/d/19q0fe9sZPYJMfabUeFs1lRtgE8c16tQC/view?usp=sharing) and all the weights for insightface (now used in source) are [here](https://drive.google.com/file/d/1JYB8t2azk19xb3KLIT7kh_bRe0vsj1Z-/view?usp=sharing)
 ## How to run from source
 
 ```bash
@@ -13,13 +14,11 @@ $ git clone https://github.com/Anurag14/accessfaceid/
 $ pip install -r requirements.txt
 $ cd faced
 $ python setup.py install
-$ cd ../training
-$ mkdir weights
-$ cd weights
+$ cd ../pretrained
 $ cp <download destination of vggface weights> .
-$ cd ../../
-$ python encode.py
-$ python main.py
+$ cd ..
+$ python encode/encode.py
+$ python livestream/newmain.py
 ```
 ## How to run a release
 Download the release from [here](https://github.com/Anurag14/accessfaceid/releases/tag/beta) then 
