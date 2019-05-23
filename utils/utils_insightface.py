@@ -1,6 +1,5 @@
 import numpy as np
 from configs import configs
-from statistics import mode
 import multiprocessing as mp 
 """
     INSIGHT FACE MODEL utils
@@ -16,7 +15,8 @@ def face_distance_single_majority(face_encodings, names, face_query, tolerance=c
     face_dist_value = np.linalg.norm(face_encodings - face_query, axis=1)
     similar_indices = np.argwhere(face_dist_value <= tolerance)
     similar_indices = [index[0] for index in similar_indices]
-    name = mode(names[similar_indices])
+    name_list = list(names[similar_indices])
+    name = max(set(name_list),key=name_list.count)
     return name
 
 def face_distance_mp_min(e_chunk, n_chunk, face_query, tolerance=configs.face_similarity_threshold):
@@ -48,9 +48,9 @@ def compare_faces_pp(known_face_encodings, names, face_query, mode, tolerance=co
     if mode=='min':
         return min(results, key = lambda t:t[0])[1]
     else:
-        return mode(results)
+        return max(set(results),key=results.count)
 
-def compare_faces(known_face_encodings, names, face_query, tolerance=configs.face_similarity_threshold):
+def compare_faces(known_face_encodings, names, face_query, mode, tolerance=configs.face_similarity_threshold):
     if mode == 'min':
         name= face_distance_single_min(known_face_encodings, names, face_query)
     else:
