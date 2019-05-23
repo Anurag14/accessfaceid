@@ -67,9 +67,12 @@ class LiveStream(camera_server.CameraServer):
             #size of fill rectangle is to made in proportion with the bbox
             height = int((y2-y1)*0.25)
             fontsize = height/50
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
+            background = (0, 255, 0)
+            if names[i]=="unknown":
+                background=(0, 0, 255)
+            cv2.rectangle(frame, (x1, y1), (x2, y2), background, 2)
             # Draw a filled rectangle below bounding box for writing name
-            cv2.rectangle(frame, (x1, y2), (x2, y2+height), (0, 0, 255), cv2.FILLED)
+            cv2.rectangle(frame, (x1, y2), (x2, y2+height), background, cv2.FILLED)
             # Write name
             cv2.putText(frame,names[i],(x1, y2+ int(height/2)),cv2.FONT_HERSHEY_SIMPLEX, fontsize,(255, 255, 255), 1)
         cv2.imshow('faces', frame)
