@@ -13,8 +13,9 @@ def face_distance_single_min(face_encodings, names, face_query, tolerance=config
     return name
 
 def face_distance_single_majority(face_encodings, names, face_query, tolerance=configs.face_similarity_threshold):
-    face_dist_value = np.linalg.norm(face_encodings -face_query, axis=1)
-    similar_indices = np.argwhere(face_dist_Value <= tolerance)
+    face_dist_value = np.linalg.norm(face_encodings - face_query, axis=1)
+    similar_indices = np.argwhere(face_dist_value <= tolerance)
+    similar_indices = [index[0] for index in similar_indices]
     name = mode(names[similar_indices])
     return name
 
