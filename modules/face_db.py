@@ -46,7 +46,7 @@ class Model(object):
     def who_is_this_face(self,face_description,cores='single',mode='majority'):
         assert cores == 'single' or cores == 'multi'
         assert mode == 'min' or mode == 'majority'
-        if len(self.faces_names) == 0 or len(self.face_descriptions)==0:
+        if len(self.faces_names) == 0 or len(self.faces_descriptions)==0:
             return "unknown"
         if cores == 'multi':
             who_is_this = compare_faces_pp(self.faces_descriptions, self.faces_names, face_description, mode)
