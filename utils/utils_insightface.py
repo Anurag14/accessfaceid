@@ -8,7 +8,7 @@ def face_distance_single_min(face_encodings, names, face_query, tolerance=config
     face_dist_value = np.linalg.norm(face_encodings - face_query, axis=1)
     index = np.argmin(face_dist_value)
     print(f'which index is minimun: {index} and value is {face_dist_value[index]}')
-    name = names[index] if face_dist_Value[index] <= tolerance else "unknown"
+    name = names[index] if face_dist_value[index] <= tolerance else "unknown"
     return name
 
 def face_distance_single_majority(face_encodings, names, face_query, tolerance=configs.face_similarity_threshold):
@@ -16,6 +16,8 @@ def face_distance_single_majority(face_encodings, names, face_query, tolerance=c
     similar_indices = np.argwhere(face_dist_value <= tolerance)
     similar_indices = [index[0] for index in similar_indices]
     name_list = list(names[similar_indices])
+    if name_list == []:
+        return "unknown"
     name = max(set(name_list),key=name_list.count)
     return name
 

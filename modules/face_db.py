@@ -43,7 +43,7 @@ class Model(object):
         print('[Face DB] Found {} similar faces in a DataBase of {} faces...'.format(num_similar_faces, len(self.faces_names)))
         return nameof_similar_faces
     
-    def who_is_this_face(self,face_description,cores='single',mode='majority'):
+    def who_is_this_face(self,face_description,cores='single',mode='min'):
         assert cores == 'single' or cores == 'multi'
         assert mode == 'min' or mode == 'majority'
         if len(self.faces_names) == 0 or len(self.faces_descriptions)==0:
