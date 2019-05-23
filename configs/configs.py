@@ -14,4 +14,4 @@ face_describer_tensor_shape = (112, 112)
 face_describer_drop_out_rate = 0.1
 test_img_fp = '{}/tests/test.jpg'.format(BASE_PATH)
 
-face_similarity_threshold = 800
+face_similarity_threshold = 700
