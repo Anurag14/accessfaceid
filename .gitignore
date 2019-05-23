@@ -10,3 +10,4 @@ faced/dist
 faced/faced.egg-info
 *.pyc
 modules/__pycache__/*.pyc
+utils/__pycache__/*.pyc
