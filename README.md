@@ -169,3 +169,4 @@ Models will be improved and uploaded.
 
 **This is not a Production ready system. Use it at your own risk.**
 
+**For stable code that will not crash in Prod (hopefully :P) check out [Releases](https://github.com/Anurag14/accessfaceid/releases).** 
