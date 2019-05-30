@@ -30,19 +30,7 @@ $ python encode/encode.py
 $ python livestream/newmain.py
 ```
 ## How to run a release
-Download the release from [here](https://github.com/Anurag14/accessfaceid/releases/tag/beta) then 
-```bash
-$ pip install -r requirements.txt
-$ cd faced
-$ python setup.py install
-$ cd ../training
-$ mkdir weights
-$ cd weights
-$ cp <download destination of vggface weights> .
-$ cd ../../
-$ python encode.py
-$ python main.py
-```
+Download the release from [here](https://github.com/Anurag14/accessfaceid/releases) 
 
 > Soon to be available on `PyPI`.
 
