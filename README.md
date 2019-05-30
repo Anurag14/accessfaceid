@@ -5,6 +5,8 @@
 <p align="center">
   <img src="faced/examples/demo_yolo.gif"/>
 </p>
+## Objective: 
+The objective of this repo is to build an open source implementation that can power things like [this](https://www.youtube.com/watch?v=wr4rx0Spihs)
 ## Weights for the model
 All weights for pretrained model of vggface (used in Release 1 and Release 2) and insightface respectively are 
 
