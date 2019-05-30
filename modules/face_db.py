@@ -12,6 +12,7 @@ class Model(object):
 
     
     def add_face(self,face_description,name):
+        face_description = face_description/np.linalg.norm(face_description) #normalize the 512 D embedding
         self.faces_descriptions = np.append(self.faces_descriptions,[face_description],axis=0)
         self.faces_names = np.append(self.faces_names,name)
 

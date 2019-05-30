@@ -53,6 +53,8 @@ def process_and_encode(dataset,filename):
         encoding = face_descriptor.inference(data_feed)[0][0]
         # the person's name is the name of the folder where the image comes from
         names.append(image_path.split(os.path.sep)[-2])
+        # normalize encoding before adding to npy file 
+        encoding = encoding/np.linalg.norm(encoding)
         encodings.append(encoding)
     np.save(filename+'_data.npy',encodings)
     np.save(filename+'_name.npy',names)
