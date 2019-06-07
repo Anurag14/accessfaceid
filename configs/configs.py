@@ -15,3 +15,5 @@ face_describer_drop_out_rate = 0.3
 test_img_fp = '{}/tests/test.jpg'.format(BASE_PATH)
 
 face_similarity_threshold = 700
+cores = 'single' # single or multi cores 
+metric = 'euclidean' #euclidean or cosine or custom 
