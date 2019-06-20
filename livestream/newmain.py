@@ -16,7 +16,7 @@ Main logics is in the process function, where you can further customize.
 
 class LiveStream(camera_server.CameraServer):
 
-    def __init__(self, cores, mode, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(LiveStream, self).__init__(*args, **kwargs)
         self.face_tracker = face_track_server.FaceTrackServer(down_scale_factor=0.5)
         self.face_describer = face_describer_server.FDServer(
@@ -25,8 +25,6 @@ class LiveStream(camera_server.CameraServer):
             output_tensor_names=configs.face_describer_output_tensor_names,
             device=configs.face_describer_device)
         self.face_db = face_db.Model()
-        self.cores = cores
-        self.mode = mode
 
     def processs(self, frame):
         # Step1. Find and track face (frame ---> [Face_Tracker] ---> Faces Loactions)
@@ -52,7 +50,7 @@ class LiveStream(camera_server.CameraServer):
 
             # Step4. For each face, check whether get its name
             # Below naive and verbose implementation is to tutor you how this work
-            _similar_face_name = self.face_db.who_is_this_face(_face_description,cores=self.cores,mode=self.mode)
+            _similar_face_name = self.face_db.who_is_this_face(_face_description)
             _names.append(_similar_face_name)
         #Step5. Visualize all the faces in the frame
         self._viz_faces(_faces_loc,_names, frame)
@@ -80,11 +78,6 @@ class LiveStream(camera_server.CameraServer):
 
 
 if __name__ == '__main__':
-    cores='single'
-    mode ='min'
-    if len(sys.argv)==3:
-        cores=sys.argv[1]
-        mode =sys.argv[2]
-    livestream = LiveStream(cores,mode,camera_address=0)
+    livestream = LiveStream(camera_address=0)
     livestream.run()
 
