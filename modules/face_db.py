@@ -1,10 +1,10 @@
 '''
-A dummy db storaing faces in memory
+A dummy db storaing faces in numpy .npy file memory
 Feel free to make it fancier like hooking with postgres or whatever
 This model here is just for simple demo app under apps
 Don't use it for production.
 '''
-from utils.utils_insightface import compare_faces_pp, compare_faces
+from utils.utils_insightface import compare_faces
 import numpy as np
 
 
@@ -44,13 +44,8 @@ class Model(object):
         print('[Face DB] Found {} similar faces in a DataBase of {} faces...'.format(num_similar_faces, len(self.faces_names)))
         return nameof_similar_faces
     
-    def who_is_this_face(self,face_description,cores='single',mode='min'):
-        assert cores == 'single' or cores == 'multi'
-        assert mode == 'min' or mode == 'majority'
+    def who_is_this_face(self,face_description):
         if len(self.faces_names) == 0 or len(self.faces_descriptions)==0:
             return "unknown"
-        if cores == 'multi':
-            who_is_this = compare_faces_pp(self.faces_descriptions, self.faces_names, face_description, mode)
-        else:
-            who_is_this = compare_faces(self.faces_descriptions, self.faces_names, face_description, mode)
+        who_is_this = compare_faces(self.faces_descriptions, self.faces_names, face_description)
         return who_is_this

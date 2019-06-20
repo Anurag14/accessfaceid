@@ -16,4 +16,5 @@ test_img_fp = '{}/tests/test.jpg'.format(BASE_PATH)
 
 face_similarity_threshold = 700
 cores = 'single' # single or multi cores 
-metric = 'euclidean' #euclidean or cosine or custom 
+metric = 'euclidean' #euclidean or cosine or custom
+mode = 'min' #min or majority
