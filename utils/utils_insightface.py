@@ -6,8 +6,8 @@ from configs import configs
 import multiprocessing as mp 
 
 #################################################################
-    Euclidean metric based methods for comparison of faces
-
+#    Euclidean metric based methods for comparison of faces     #
+#                                                               #
 #################################################################
 
 def singlecore_euclidean(face_encodings, names, face_query, tolerance=configs.face_similarity_threshold):
@@ -44,8 +44,8 @@ def multicore_euclidean(e_chunk, n_chunk, face_query, tolerance=configs.face_sim
         return name_list
 
 #################################################################
-    Cosine metric based methods for comparison of faces
-
+#   Cosine metric based methods for comparison of faces         #
+#                                                               #
 #################################################################
 
 def singlecore_cosine(face_encodings, names, face_query, tolerance=configs.face_similarity_threshold):
@@ -82,8 +82,8 @@ def multicore_cosine(e_chunk, n_chunk, face_query, tolerance=configs.face_simila
         return name_list
 
 #################################################################
-    Custom metric based methods for comparison of faces
-
+#    Custom metric based methods for comparison of faces        #
+#                                                               #
 #################################################################
 
 def singlecore_custom(face_encodings, names, face_query, tolerance=configs.face_similarity_threshold):
@@ -120,8 +120,8 @@ def multicore_custom(e_chunk, n_chunk, face_query, tolerance=configs.face_simila
         return name_list
     
 #################################################################
-    Core based calling methods for comparison of faces
-
+#    Core based calling methods for comparison of faces         #
+#                                                               #
 #################################################################    
 def multicore(known_face_encodings,names,face_query):
     """
@@ -160,9 +160,10 @@ def singlecore(known_face_encodings, names, face_query):
     return name
 
 #################################################################
-    Main method for comparison of faces
-
+#    Main method for comparison of faces                        #
+#                                                               #
 #################################################################
+
 def comparefaces(known_face_encodings, names, face_query):
     """
     comparefaces as a procedure calls over the single core or multicore implementation of it basis the 
