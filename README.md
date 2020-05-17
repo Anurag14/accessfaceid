@@ -35,8 +35,8 @@ Download the release from [here](https://github.com/Anurag14/accessfaceid/releas
 > Soon to be available on `PyPI`.
 
 ## How to use face detection as an library
-
-### As library
+## Note: This repo uses the awesome work (faced) for detecting face. Check it out [here](https://github.com/iitzco/faced)
+### Faced as library
 
 ```python
 import cv2
