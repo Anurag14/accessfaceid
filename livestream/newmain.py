@@ -44,7 +44,7 @@ class LiveStream(camera_server.CameraServer):
             face_descriptions.append(face_description)
             similar_face_name = self.face_db.who_is_this_face(face_description)
             names.append(similar_face_name)
-        
+        print(names)
         #Step3. Visualize all the faces in the frame
         self.viz_faces(faces_loc, names, frame)
         print('[Live Streaming] -----------------------------------------------------------')
@@ -66,7 +66,7 @@ class LiveStream(camera_server.CameraServer):
             # Draw a filled rectangle below bounding box for writing name
             cv2.rectangle(frame, (x, y+height), (x+width, int(y+1.1*height)), background, cv2.FILLED)
             # Write name
-            cv2.putText(frame,names[i],(x,int(y+1.1*height)),cv2.FONT_HERSHEY_SIMPLEX, fontsize,(255, 255, 255), 1)
+            cv2.putText(frame,names[i].split('\\')[1],(x,int(y+1.1*height)),cv2.FONT_HERSHEY_SIMPLEX, fontsize,(255, 255, 255), 1)
         cv2.imshow('faces', frame)
         cv2.waitKey(1)
 
