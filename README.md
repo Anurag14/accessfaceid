@@ -20,13 +20,9 @@ All weights for pretrained model of vggface (used in Release 1 and Release 2) an
 
 ```bash
 $ git clone https://github.com/Anurag14/accessfaceid/
+$ conda env create -f environment.yml
 $ pip install -r requirements.txt
-$ cd faced
-$ python setup.py install
-$ cd ../pretrained
-$ cp <download destination of vggface weights> .
-$ cd ..
-$ python encode/encode.py
+$ python encode/encode_deepface.py
 $ python livestream/newmain.py
 ```
 ## How to run a release
