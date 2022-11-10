@@ -4,7 +4,6 @@ Feel free to make it fancier like hooking with postgres or whatever
 This model here is just for simple demo app under apps
 Don't use it for production.
 '''
-from utils.utils_insightface import compare_faces
 import numpy as np
 
 
@@ -15,16 +14,13 @@ class Model(object):
         face_description = face_description/np.linalg.norm(face_description) #normalize the 512 D embedding
         self.faces_descriptions = np.append(self.faces_descriptions,[face_description],axis=0)
         self.faces_names = np.append(self.faces_names,name)
+        np.savez('data/encodings/encoding.npz',encondings=self.faces_descriptions,names=self.face_names)
 
-        
-        np.save(self.filename+'_data.npy',self.faces_descriptions)
-        np.save(self.filename+'_name.npy',self.faces_names)
-
-    def __init__(self,model_name='insightface'):
+    def __init__(self,model_name='ArcFace'):
         print("[LOG] Loading Encoded faces Database ...")
-        self.filename='data/encodings/encoding_'+model_name
-        self.faces_descriptions=np.load(self.filename+'_data.npy')
-        self.faces_names = np.load(self.filename+'_name.npy')
+        self.file = np.load('data/encodings/encoding.npz')
+        self.faces_descriptions=self.file['encondings']
+        self.faces_names = self.file['names']
     
     def drop_all(self):
         self.faces_names = []
@@ -33,19 +29,14 @@ class Model(object):
     def get_all(self):
         return self.faces_names, self.faces_discriptions
 
-    #This method will be deprecated
-    def get_similar_faces(self, face_description):
-        print('[Face DB] Looking for similar faces in a DataBase of {} faces...'.format(len(self.faces)))
-        if len(self.faces) == 0:
-            return []
-        # Use items in Python 3*, below is by default for Python 2*
-        nameof_similar_faces = np.array(self.faces_names)[similar_face_idx]
-        num_similar_faces = len(nameof_similar_faces)
-        print('[Face DB] Found {} similar faces in a DataBase of {} faces...'.format(num_similar_faces, len(self.faces_names)))
-        return nameof_similar_faces
+    def softmax(self, x):
+        """Compute softmax values for each sets of scores in x."""
+        e_x = np.exp(x - np.max(x))
+        return e_x / e_x.sum()
     
     def who_is_this_face(self,face_description):
         if len(self.faces_names) == 0 or len(self.faces_descriptions)==0:
             return "unknown"
-        who_is_this = compare_faces(self.faces_descriptions, self.faces_names, face_description)
+        similarity = self.faces_descriptions @ face_description
+        who_is_this = self.faces_names[np.argmax(self.softmax(similarity))]
         return who_is_this

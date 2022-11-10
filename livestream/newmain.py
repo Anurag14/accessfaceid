@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0,'.')
 import cv2
 import numpy as np
-from modules import face_track_server, face_describer_server, face_db, camera_server
+from modules import face_describer_server, face_track_server, camera_server, face_db
 from configs import configs
 
 '''
@@ -18,61 +18,55 @@ class LiveStream(camera_server.CameraServer):
 
     def __init__(self, *args, **kwargs):
         super(LiveStream, self).__init__(*args, **kwargs)
-        self.face_tracker = face_track_server.FaceTrackServer(down_scale_factor=0.5)
-        self.face_describer = face_describer_server.FDServer(
-            model_fp=configs.face_describer_model_fp,
-            input_tensor_names=configs.face_describer_input_tensor_names,
-            output_tensor_names=configs.face_describer_output_tensor_names,
-            device=configs.face_describer_device)
+        self.face_tracker = face_track_server.FaceTrackServer(detector_backend='opencv')
+        self.face_describer = face_describer_server.FDServer(model_name=configs.model_name)
         self.face_db = face_db.Model()
 
     def processs(self, frame):
-        # Step1. Find and track face (frame ---> [Face_Tracker] ---> Faces Loactions)
-        self.face_tracker.process(frame)
-        _faces = self.face_tracker.get_faces()
+        # Step1. Find and track face (frame ---> [Face_Tracker] ---> Faces Locations)
+        faces_loc = self.face_tracker.process(frame)
 
-        # Step2. Get all the face locations aka bounding boxes
-        _faces_loc = self.face_tracker.get_faces_loc()
-
-        # Step3. For each face, get the cropped face area, feeding it to face describer (insightface) to get 512-D Feature Embedding
-        _face_descriptions = []
-        _names = []
-        _num_faces = len(_faces)
-        if _num_faces == 0:
+        print("face location: ", faces_loc)
+        # Step2. For each face, get the cropped face area, feeding it to face describer
+        # to get 512-D Feature Embedding
+        face_descriptions = []
+        names = []
+        num_faces = len(faces_loc)
+        if num_faces == 0:
             #only display the frame in the feed no need to do anythine else
-            self._viz_faces([],[],frame)
+            self.viz_faces([],[],frame)
             return
-        for _face in _faces:
-            _face_resize = cv2.resize(_face, configs.face_describer_tensor_shape)
-            _data_feed = [np.expand_dims(_face_resize, axis=0), configs.face_describer_drop_out_rate]
-            _face_description = self.face_describer.inference(_data_feed)[0][0]
-            _face_descriptions.append(_face_description)
 
-            # Step4. For each face, check whether get its name
-            # Below naive and verbose implementation is to tutor you how this work
-            _similar_face_name = self.face_db.who_is_this_face(_face_description)
-            _names.append(_similar_face_name)
-        #Step5. Visualize all the faces in the frame
-        self._viz_faces(_faces_loc,_names, frame)
+        for face_loc in faces_loc:
+            x, y, w, h = face_loc
+            face = frame[y:y + h, x:x + w]
+            face_description = self.face_describer.inference(face)
+            face_descriptions.append(face_description)
+            similar_face_name = self.face_db.who_is_this_face(face_description)
+            names.append(similar_face_name)
+        
+        #Step3. Visualize all the faces in the frame
+        self.viz_faces(faces_loc, names, frame)
         print('[Live Streaming] -----------------------------------------------------------')
 
-    def _viz_faces(self, faces_loc, names, frame):
+    def viz_faces(self, faces_loc, names, frame):
         for i in range(len(names)):
-            x1 = int(faces_loc[i][0] * self.face_tracker.cam_w)
-            y1 = int(faces_loc[i][1] * self.face_tracker.cam_h)
-            x2 = int(faces_loc[i][2] * self.face_tracker.cam_w)
-            y2 = int(faces_loc[i][3] * self.face_tracker.cam_h)
+            if faces_loc[i] == None:
+                continue
+            x = int(faces_loc[i][0])
+            y = int(faces_loc[i][1])
+            width = int(faces_loc[i][2])
+            height = int(faces_loc[i][3])
             #size of fill rectangle is to made in proportion with the bbox
-            height = int((y2-y1)*0.25)
-            fontsize = height/50
+            fontsize = height/200
             background = (0, 255, 0)
             if names[i]=="unknown":
                 background=(0, 0, 255)
-            cv2.rectangle(frame, (x1, y1), (x2, y2), background, 2)
+            cv2.rectangle(frame, (x, y), (x+width, y+height), background, 2)
             # Draw a filled rectangle below bounding box for writing name
-            cv2.rectangle(frame, (x1, y2), (x2, y2+height), background, cv2.FILLED)
+            cv2.rectangle(frame, (x, y+height), (x+width, int(y+1.1*height)), background, cv2.FILLED)
             # Write name
-            cv2.putText(frame,names[i],(x1, y2+ int(height/2)),cv2.FONT_HERSHEY_SIMPLEX, fontsize,(255, 255, 255), 1)
+            cv2.putText(frame,names[i],(x,int(y+1.1*height)),cv2.FONT_HERSHEY_SIMPLEX, fontsize,(255, 255, 255), 1)
         cv2.imshow('faces', frame)
         cv2.waitKey(1)
 
